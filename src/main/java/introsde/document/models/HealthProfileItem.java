@@ -88,10 +88,12 @@ public class HealthProfileItem implements Serializable {
         return measure;
     }
 
+    @XmlElement(name = "measureValue")
     public Float getValue() {
         return value;
     }
 
+    @XmlElement(name = "dateRegistered")
     public Date getCreated() {
         return created;
     }

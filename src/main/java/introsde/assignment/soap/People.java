@@ -2,38 +2,65 @@ package introsde.assignment.soap;
 
 import introsde.document.models.HealthProfileItem;
 import introsde.document.models.Person;
+import introsde.document.responses.*;
 
 import javax.jws.WebMethod;
 import javax.jws.WebParam;
 import javax.jws.WebResult;
 import javax.jws.WebService;
 import javax.jws.soap.SOAPBinding;
-import java.util.List;
 
 @WebService
 @SOAPBinding(style = SOAPBinding.Style.DOCUMENT)
 public interface People {
-    @WebMethod(operationName="readPersonList")
-    @WebResult(name="people")
-    public List<Person> readPersonList();
 
-    @WebMethod(operationName="readPerson")
-    @WebResult(name="person")
-    public Person readPerson(@WebParam(name="id") long id);
+    // Method 1
+    @WebMethod(operationName = "readPersonList")
+    @WebResult(name = "people")
+    public PersonListResponse readPersonList();
 
-    @WebMethod(operationName="updatePerson")
-    @WebResult(name="person")
-    public Person updatePerson(@WebParam(name="p") Person p);
+    // Method 2
+    @WebMethod(operationName = "readPerson")
+    @WebResult(name = "person")
+    public PersonResponse readPerson(@WebParam(name = "id") int id);
 
-    @WebMethod(operationName="createPerson")
-    @WebResult(name="person")
-    public Person createPerson(@WebParam(name="p") Person p);
+    // Method 3
+    @WebMethod(operationName = "updatePerson")
+    @WebResult(name = "person")
+    public PersonResponse updatePerson(@WebParam(name = "p") Person p);
 
-    @WebMethod(operationName="deletePerson")
-    @WebResult(name="personId")
-    public int deletePerson(@WebParam(name="personId") long id);
+    // Method 4
+    @WebMethod(operationName = "createPerson")
+    @WebResult(name = "person")
+    public PersonResponse createPerson(@WebParam(name = "p") Person p);
 
-    @WebMethod(operationName="readPersonHistory")
-    @WebResult(name="healthProfile-history")
-    public List<HealthProfileItem> readPersonHistory (@WebParam(name="id") long id, @WebParam(name="measureType") String measureType);
+    // Method 5
+    @WebMethod(operationName = "deletePerson")
+    @WebResult(name = "id")
+    public int deletePerson(@WebParam(name = "id") int id);
+
+    // Method 6
+    @WebMethod(operationName = "readPersonHistory")
+    @WebResult(name = "healthProfile-history")
+    public MeasureHistoryResponse readPersonHistory(@WebParam(name = "id") int id, @WebParam(name = "measureType") String measureType);
+
+    // Method 7
+    @WebMethod(operationName = "readMeasureTypes")
+    @WebResult(name = "measureTypes")
+    public MeasureTypesResponse readMeasureTypes();
+
+    // Method 8
+    @WebMethod(operationName = "readPersonMeasure")
+    @WebResult(name = "measure")
+    public HealthProfileItemResponse readPersonMeasure(@WebParam(name = "id") int id, @WebParam(name = "measureType") String measureType, @WebParam(name = "mid") int mid);
+
+    // Method 9
+    @WebMethod(operationName = "savePersonMeasure")
+    @WebResult(name = "measure")
+    public HealthProfileItemResponse savePersonMeasure(@WebParam(name = "id") int id, @WebParam(name = "measure") HealthProfileItem healthProfileItem);
+
+    // Method 10
+    @WebMethod(operationName = "updatePersonMeasure")
+    @WebResult(name = "measure")
+    public HealthProfileItemResponse updatePersonMeasure(@WebParam(name = "id") int id, @WebParam(name = "measure") HealthProfileItem healthProfileItem);
 }

@@ -42,7 +42,6 @@ public class Person implements Serializable {
     }
 
     // Getters and setters
-    @XmlElement(name = "pid")
     public int getPersonId() {
         return personId;
     }
