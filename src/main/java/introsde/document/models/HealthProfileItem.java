@@ -57,7 +57,10 @@ public class HealthProfileItem implements Serializable {
     private MeasureType measureType;
 
     @Column(name = "value")
-    private Float value;
+    private String value;
+
+    @Column(name = "valueType")
+    private String valueType;
 
     @Temporal(TemporalType.DATE)
     @Column(name="created")
@@ -88,8 +91,13 @@ public class HealthProfileItem implements Serializable {
     }
 
     @XmlElement(name = "measureValue")
-    public Float getValue() {
+    public String getValue() {
         return value;
+    }
+
+    @XmlElement(name = "measureValueType")
+    public String getValueType() {
+        return valueType;
     }
 
     @XmlElement(name = "dateRegistered")
@@ -100,18 +108,6 @@ public class HealthProfileItem implements Serializable {
     public boolean isValid() {
         return isValid;
     }
-
-    /*
-    @XmlElement(name = "name") // Fake getter to retrieve the measureType name
-    @JsonProperty("name")
-    public String getMeasureName() {
-        if (measureType != null) {
-            return measureType.getName();
-        }
-        return measureName;
-    }
-    */
-
 
     public void setHealthProfileId(int healthProfileId) {
         this.healthProfileId = healthProfileId;
@@ -124,7 +120,6 @@ public class HealthProfileItem implements Serializable {
     public void setMeasureType(MeasureType measureType) {
         if (measureType != null) {
             this.measureType = measureType;
-            // this.measureName = measureType.getName();
         }
     }
 
@@ -132,8 +127,12 @@ public class HealthProfileItem implements Serializable {
         this.created = created;
     }
 
-    public void setValue(Float value) {
+    public void setValue(String value) {
         this.value = value;
+    }
+
+    public void setValueType(String valueType) {
+        this.valueType = valueType;
     }
 
     public void setValid(boolean valid) {

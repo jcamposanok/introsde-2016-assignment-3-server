@@ -36,7 +36,7 @@ public interface People {
 
     // Method 5
     @WebMethod(operationName = "deletePerson")
-    @WebResult(name = "id")
+    @WebResult(name = "personId")
     public int deletePerson(@WebParam(name = "id") int id);
 
     // Method 6

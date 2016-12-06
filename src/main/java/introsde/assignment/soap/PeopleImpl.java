@@ -60,12 +60,13 @@ public class PeopleImpl implements People {
     // Method 5
     @Override
     public int deletePerson(int id) {
+        int response = -1;
         Person existing = Person.getById(id);
-        if (existing == null) {
-            return -1;
+        if (existing != null) {
+            response = existing.getPersonId();
+            Person.removePerson(existing);
         }
-        Person.removePerson(existing);
-        return id;
+        return response;
     }
 
     // Method 6
@@ -121,7 +122,8 @@ public class PeopleImpl implements People {
             HealthProfileItem newHealthProfileItem = new HealthProfileItem();
             newHealthProfileItem.setPerson(person);
             newHealthProfileItem.setMeasureType(measureType);
-            newHealthProfileItem.setValue(Float.parseFloat(m.getMeasureValue()));
+            newHealthProfileItem.setValue(m.getMeasureValue());
+            newHealthProfileItem.setValueType(m.getMeasureValueType());
             newHealthProfileItem.setCreated(m.getDateRegistered());
             newHealthProfileItem.setValid(true);
             return new HealthProfileItemResponse(HealthProfileItem.saveHealthProfileItem(newHealthProfileItem));
@@ -132,6 +134,7 @@ public class PeopleImpl implements People {
         backupHealthProfileItem.setPerson(existing.getPerson());
         backupHealthProfileItem.setMeasureType(existing.getMeasureType());
         backupHealthProfileItem.setValue(existing.getValue());
+        backupHealthProfileItem.setValueType(existing.getValueType());
         backupHealthProfileItem.setCreated(existing.getCreated());
         backupHealthProfileItem.setValid(false);
         HealthProfileItem.saveHealthProfileItem(backupHealthProfileItem);
@@ -139,7 +142,8 @@ public class PeopleImpl implements People {
         existing.setPerson(person);
         existing.setMeasureType(measureType);
         existing.setCreated(m.getDateRegistered());
-        existing.setValue(Float.parseFloat(m.getMeasureValue()));
+        existing.setValue(m.getMeasureValue());
+        existing.setValueType(m.getMeasureValueType());
         return new HealthProfileItemResponse(HealthProfileItem.updateHealthProfileItem(existing));
     }
 
@@ -162,7 +166,8 @@ public class PeopleImpl implements People {
         existing.setPerson(person);
         existing.setMeasureType(measureType);
         existing.setCreated(m.getDateRegistered());
-        existing.setValue(Float.parseFloat(m.getMeasureValue()));
+        existing.setValue(m.getMeasureValue());
+        existing.setValueType(m.getMeasureValueType());
         return new HealthProfileItemResponse(HealthProfileItem.updateHealthProfileItem(existing));
     }
 }

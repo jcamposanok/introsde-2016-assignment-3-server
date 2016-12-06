@@ -18,11 +18,10 @@ import java.util.Properties;
 @WebListener
 public class HealthDao implements ServletContextListener {
 
-    private String DEFAULT_DB_URL = "jdbc:sqlite:%s/db/ehealth.sqlite";
+    private String DEFAULT_DB_URL = "./db/ehealth.sqlite";
     private String PERSISTENCE_UNIT = "HealthPersistenceUnit";
 
     private static EntityManagerFactory emf;
-    private boolean pushAdditionalProperties = true;
 
     public HealthDao() {
     }
@@ -32,17 +31,17 @@ public class HealthDao implements ServletContextListener {
         String databaseUrl = System.getenv("DATABASE_URL");
 
         if (databaseUrl == null) {
-            String basedir;
+            String dbFilePath;
             Properties props = new Properties();
             URL url = this.getClass().getClassLoader().getResource("project.properties");
             try {
                 props.load(url.openStream());
-                basedir = props.getProperty("project.basedir");
+                dbFilePath = props.getProperty("project.db");
             } catch (IOException e) {
                 e.printStackTrace();
-                basedir = "";
+                dbFilePath = DEFAULT_DB_URL;
             }
-            databaseUrl = String.format(DEFAULT_DB_URL, basedir);
+            databaseUrl = String.format("jdbc:sqlite:%s", dbFilePath);
             System.out.println("Use default config in persistence.xml with " + databaseUrl);
         }
 

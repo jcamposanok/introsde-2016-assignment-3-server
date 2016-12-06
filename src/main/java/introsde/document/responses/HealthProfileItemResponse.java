@@ -13,7 +13,7 @@ public class HealthProfileItemResponse {
     private int healthProfileId;
     private Person person;
     private MeasureType measureType;
-    private Float value;
+    private String value;
     private Date created;
     private boolean isValid;
     private String measureName;
@@ -27,7 +27,7 @@ public class HealthProfileItemResponse {
         person = i.getPerson();
         measureType = i.getMeasureType();
         value = i.getValue();
-        valueType = i.getValue().getClass().getName();
+        valueType = i.getValueType();
         created = i.getCreated();
         isValid = i.isValid();
     }
@@ -52,7 +52,7 @@ public class HealthProfileItemResponse {
     }
 
     @XmlElement(name = "measureValue")
-    public Float getValue() {
+    public String getValue() {
         return value;
     }
 
@@ -82,7 +82,7 @@ public class HealthProfileItemResponse {
     public void setMeasureType(MeasureType measureType) {
         this.measureType = measureType;
     }
-    public void setValue(Float value) {
+    public void setValue(String value) {
         this.value = value;
     }
     public void setValueType(String valueType) { this.valueType = valueType; }
