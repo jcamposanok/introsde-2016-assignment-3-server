@@ -44,7 +44,8 @@ public class PersonResponse {
         return birthdate;
     }
 
-    @XmlElementWrapper(name = "healthHistory")
+    @XmlElementWrapper(name = "healthProfile-history")
+    @XmlElement(name = "measure")
     public List<HealthProfileItemResponse> getHealthProfile() {
         return healthProfile;
     }

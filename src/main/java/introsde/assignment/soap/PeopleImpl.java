@@ -2,6 +2,7 @@ package introsde.assignment.soap;
 
 import introsde.document.models.HealthProfileItem;
 import introsde.document.models.Measure;
+import introsde.document.models.MeasureType;
 import introsde.document.models.Person;
 import introsde.document.responses.*;
 
@@ -41,7 +42,7 @@ public class PeopleImpl implements People {
     public PersonResponse updatePerson(Person p) {
         Person existing = Person.getById(p.getPersonId());
         if (existing == null) {
-            return new PersonResponse(p);
+            return new PersonResponse();
         }
         return new PersonResponse(Person.updatePerson(p));
     }
@@ -85,9 +86,9 @@ public class PeopleImpl implements People {
     @Override
     public MeasureTypesResponse readMeasureTypes() {
         MeasureTypesResponse response = new MeasureTypesResponse();
-        List<Measure> measureList = Measure.getAll();
-        if (measureList != null & measureList.size() > 0) {
-            response.setMeasureTypes(measureList);
+        List<MeasureType> measureTypeList = MeasureType.getAll();
+        if (measureTypeList != null & measureTypeList.size() > 0) {
+            response.setMeasureTypes(measureTypeList);
         }
         return response;
     }
@@ -102,19 +103,66 @@ public class PeopleImpl implements People {
         return new HealthProfileItemResponse(existing);
     }
 
-    // TODO: Implement 9, 10
-
     // Method 9
     @Override
-    public HealthProfileItemResponse savePersonMeasure(int id, HealthProfileItem healthProfileItem) {
-        HealthProfileItemResponse response = new HealthProfileItemResponse();
-        return response;
+    public HealthProfileItemResponse savePersonMeasure(int id, Measure m) {
+        Person person = Person.getById(id);
+        if (person == null || m.getMeasureType() == null) {
+            return new HealthProfileItemResponse();
+        }
+        MeasureType measureType = MeasureType.getByName(m.getMeasureType());
+        if (measureType == null || measureType.getMeasureId() <= 0) {
+            return new HealthProfileItemResponse();
+        }
+
+        HealthProfileItem existing = HealthProfileItem.getCurrentByPersonAndType(id, measureType.getName());
+        if (existing == null || existing.getHealthProfileId() <= 0) {
+            // No old value, just save the current one
+            HealthProfileItem newHealthProfileItem = new HealthProfileItem();
+            newHealthProfileItem.setPerson(person);
+            newHealthProfileItem.setMeasureType(measureType);
+            newHealthProfileItem.setValue(Float.parseFloat(m.getMeasureValue()));
+            newHealthProfileItem.setCreated(m.getDateRegistered());
+            newHealthProfileItem.setValid(true);
+            return new HealthProfileItemResponse(HealthProfileItem.saveHealthProfileItem(newHealthProfileItem));
+        }
+
+        // Archive the old value in the history
+        HealthProfileItem backupHealthProfileItem = new HealthProfileItem();
+        backupHealthProfileItem.setPerson(existing.getPerson());
+        backupHealthProfileItem.setMeasureType(existing.getMeasureType());
+        backupHealthProfileItem.setValue(existing.getValue());
+        backupHealthProfileItem.setCreated(existing.getCreated());
+        backupHealthProfileItem.setValid(false);
+        HealthProfileItem.saveHealthProfileItem(backupHealthProfileItem);
+
+        existing.setPerson(person);
+        existing.setMeasureType(measureType);
+        existing.setCreated(m.getDateRegistered());
+        existing.setValue(Float.parseFloat(m.getMeasureValue()));
+        return new HealthProfileItemResponse(HealthProfileItem.updateHealthProfileItem(existing));
     }
 
     // Method 10
     @Override
-    public HealthProfileItemResponse updatePersonMeasure(int id, HealthProfileItem healthProfileItem) {
-        HealthProfileItemResponse response = new HealthProfileItemResponse();
-        return response;
+    public HealthProfileItemResponse updatePersonMeasure(int id, Measure m) {
+        Person person = Person.getById(id);
+        if (person == null || m.getMeasureType() == null) {
+            return new HealthProfileItemResponse();
+        }
+        MeasureType measureType = MeasureType.getByName(m.getMeasureType());
+        if (measureType == null || measureType.getMeasureId() <= 0) {
+            return new HealthProfileItemResponse();
+        }
+        HealthProfileItem existing = HealthProfileItem.getById(m.getMid().intValue());
+        if (existing == null || existing.getHealthProfileId() <= 0) {
+            return new HealthProfileItemResponse();
+        }
+
+        existing.setPerson(person);
+        existing.setMeasureType(measureType);
+        existing.setCreated(m.getDateRegistered());
+        existing.setValue(Float.parseFloat(m.getMeasureValue()));
+        return new HealthProfileItemResponse(HealthProfileItem.updateHealthProfileItem(existing));
     }
 }

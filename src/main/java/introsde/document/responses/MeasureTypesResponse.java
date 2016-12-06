@@ -1,6 +1,6 @@
 package introsde.document.responses;
 
-import introsde.document.models.Measure;
+import introsde.document.models.MeasureType;
 
 import javax.xml.bind.annotation.XmlElement;
 import java.util.List;
@@ -8,14 +8,14 @@ import java.util.List;
 
 public class MeasureTypesResponse {
 
-    private List<Measure> measureTypes;
+    private List<MeasureType> measureTypes;
 
     @XmlElement(name = "measureType")
-    public List<Measure> getMeasureTypes() {
+    public List<MeasureType> getMeasureTypes() {
         return measureTypes;
     }
 
-    public void setMeasureTypes(List<Measure> measureTypes) {
+    public void setMeasureTypes(List<MeasureType> measureTypes) {
         this.measureTypes = measureTypes;
     }
 

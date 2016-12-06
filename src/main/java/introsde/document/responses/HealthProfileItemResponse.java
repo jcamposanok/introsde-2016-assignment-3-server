@@ -1,7 +1,7 @@
 package introsde.document.responses;
 
 import introsde.document.models.HealthProfileItem;
-import introsde.document.models.Measure;
+import introsde.document.models.MeasureType;
 import introsde.document.models.Person;
 
 import javax.xml.bind.annotation.XmlElement;
@@ -12,7 +12,7 @@ public class HealthProfileItemResponse {
 
     private int healthProfileId;
     private Person person;
-    private Measure measure;
+    private MeasureType measureType;
     private Float value;
     private Date created;
     private boolean isValid;
@@ -25,7 +25,7 @@ public class HealthProfileItemResponse {
     public HealthProfileItemResponse(HealthProfileItem i) {
         healthProfileId = i.getHealthProfileId();
         person = i.getPerson();
-        measure = i.getMeasure();
+        measureType = i.getMeasureType();
         value = i.getValue();
         valueType = i.getValue().getClass().getName();
         created = i.getCreated();
@@ -45,8 +45,8 @@ public class HealthProfileItemResponse {
 
     @XmlElement(name = "measureType")
     public String getMeasureName() {
-        if (measure != null) {
-            return measure.getName();
+        if (measureType != null) {
+            return measureType.getName();
         }
         return measureName;
     }
@@ -79,8 +79,8 @@ public class HealthProfileItemResponse {
     public void setPerson(Person person) {
         this.person = person;
     }
-    public void setMeasure(Measure measure) {
-        this.measure = measure;
+    public void setMeasureType(MeasureType measureType) {
+        this.measureType = measureType;
     }
     public void setValue(Float value) {
         this.value = value;

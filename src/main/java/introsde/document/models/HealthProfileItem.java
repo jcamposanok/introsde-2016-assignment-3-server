@@ -1,7 +1,6 @@
 package introsde.document.models;
 
 import introsde.document.dao.HealthDao;
-import introsde.document.util.DateParser;
 
 import javax.persistence.*;
 import javax.xml.bind.annotation.XmlElement;
@@ -19,25 +18,25 @@ import java.util.List;
         @NamedQuery(name = "HealthProfile.findAll", query = "SELECT hp FROM HealthProfileItem hp"),
         @NamedQuery(name = "HealthProfile.findByType",
                 query = "SELECT hp FROM HealthProfileItem hp " +
-                        "WHERE hp.measure = :measure"),
+                        "WHERE hp.measureType = :measure"),
         @NamedQuery(name = "HealthProfile.findByTypeMin",
                 query = "SELECT hp FROM HealthProfileItem hp " +
-                        "WHERE hp.measure = :measure AND hp.value >= :minValue"),
+                        "WHERE hp.measureType = :measure AND hp.value >= :minValue"),
         @NamedQuery(name = "HealthProfile.findByTypeMax",
                 query = "SELECT hp FROM HealthProfileItem hp " +
-                        "WHERE hp.measure = :measure AND hp.value <= :maxValue"),
+                        "WHERE hp.measureType = :measure AND hp.value <= :maxValue"),
         @NamedQuery(name = "HealthProfile.findByTypeRange",
                 query = "SELECT hp FROM HealthProfileItem hp " +
-                        "WHERE hp.measure = :measure AND hp.value BETWEEN :minValue AND :maxValue"),
+                        "WHERE hp.measureType = :measure AND hp.value BETWEEN :minValue AND :maxValue"),
         @NamedQuery(name = "HealthProfile.findByPersonAndType",
                 query = "SELECT hp FROM HealthProfileItem hp " +
-                        "WHERE hp.person = :person AND hp.measure = :measure"),
+                        "WHERE hp.person = :person AND hp.measureType = :measure"),
         @NamedQuery(name = "HealthProfile.getCurrentByPersonAndType",
                 query = "SELECT hp FROM HealthProfileItem hp " +
-                        "WHERE hp.person = :person AND hp.measure = :measure AND hp.isValid = TRUE"),
+                        "WHERE hp.person = :person AND hp.measureType = :measure AND hp.isValid = TRUE"),
         @NamedQuery(name = "HealthProfile.findByDate",
                 query = "SELECT hp FROM HealthProfileItem hp " +
-                        "WHERE hp.person = :person AND hp.measure = :measure " +
+                        "WHERE hp.person = :person AND hp.measureType = :measure " +
                         "AND hp.created BETWEEN :after AND :before")
 })
 @XmlRootElement
@@ -55,7 +54,7 @@ public class HealthProfileItem implements Serializable {
 
     @ManyToOne
     @JoinColumn(name = "measureId", referencedColumnName = "measureId")
-    private Measure measure;
+    private MeasureType measureType;
 
     @Column(name = "value")
     private Float value;
@@ -84,8 +83,8 @@ public class HealthProfileItem implements Serializable {
     }
 
     @XmlTransient // To prevent infinite loop
-    public Measure getMeasure() {
-        return measure;
+    public MeasureType getMeasureType() {
+        return measureType;
     }
 
     @XmlElement(name = "measureValue")
@@ -103,11 +102,11 @@ public class HealthProfileItem implements Serializable {
     }
 
     /*
-    @XmlElement(name = "name") // Fake getter to retrieve the measure name
+    @XmlElement(name = "name") // Fake getter to retrieve the measureType name
     @JsonProperty("name")
     public String getMeasureName() {
-        if (measure != null) {
-            return measure.getName();
+        if (measureType != null) {
+            return measureType.getName();
         }
         return measureName;
     }
@@ -122,10 +121,10 @@ public class HealthProfileItem implements Serializable {
         this.person = person;
     }
 
-    public void setMeasure(Measure measure) {
-        if (measure != null) {
-            this.measure = measure;
-            // this.measureName = measure.getName();
+    public void setMeasureType(MeasureType measureType) {
+        if (measureType != null) {
+            this.measureType = measureType;
+            // this.measureName = measureType.getName();
         }
     }
 
@@ -153,34 +152,34 @@ public class HealthProfileItem implements Serializable {
         return hp;
     }
 
-    public static List<HealthProfileItem> getAllByType(String measureType, float minValue, float maxValue) {
+    public static List<HealthProfileItem> getAllByType(String measureTypeName, float minValue, float maxValue) {
         List<HealthProfileItem> resultList = new ArrayList<>();
         EntityManager em = HealthDao.createEntityManager();
         if (em != null) {
-            Measure measure = Measure.getByName(measureType);
-            if (measure != null) {
+            MeasureType measureType = MeasureType.getByName(measureTypeName);
+            if (measureType != null) {
                 if (minValue >= 0 && maxValue >= 0) {
                     resultList = em.createNamedQuery("HealthProfile.findByTypeRange")
-                            .setParameter("measure", measure)
+                            .setParameter("measure", measureType)
                             .setParameter("minValue", minValue)
                             .setParameter("maxValue", maxValue)
                             .getResultList();
                 }
                 else if (minValue >= 0) {
                     resultList = em.createNamedQuery("HealthProfile.findByTypeMin")
-                            .setParameter("measure", measure)
+                            .setParameter("measure", measureType)
                             .setParameter("minValue", minValue)
                             .getResultList();
                 }
                 else if (maxValue >= 0) {
                     resultList = em.createNamedQuery("HealthProfile.findByTypeMax")
-                            .setParameter("measure", measure)
+                            .setParameter("measure", measureType)
                             .setParameter("maxValue", maxValue)
                             .getResultList();
                 }
                 else {
                     resultList = em.createNamedQuery("HealthProfile.findByType")
-                            .setParameter("measure", measure)
+                            .setParameter("measure", measureType)
                             .getResultList();
                 }
             }
@@ -189,16 +188,16 @@ public class HealthProfileItem implements Serializable {
         return resultList;
     }
 
-    public static List<HealthProfileItem> getAllByPersonAndType(int personId, String measureType) {
+    public static List<HealthProfileItem> getAllByPersonAndType(int personId, String measureTypeName) {
         List<HealthProfileItem> resultList = new ArrayList<>();
         EntityManager em = HealthDao.createEntityManager();
         if (em != null) {
             Person person = Person.getById(personId);
-            Measure measure = Measure.getByName(measureType);
-            if (person != null && measure != null) {
+            MeasureType measureType = MeasureType.getByName(measureTypeName);
+            if (person != null && measureType != null) {
                 resultList = em.createNamedQuery("HealthProfile.findByPersonAndType")
                         .setParameter("person", person)
-                        .setParameter("measure", measure)
+                        .setParameter("measure", measureType)
                         .getResultList();
             }
             em.close();
@@ -206,17 +205,17 @@ public class HealthProfileItem implements Serializable {
         return resultList;
     }
 
-    public static HealthProfileItem getCurrentByPersonAndType(int personId, String measureType) {
+    public static HealthProfileItem getCurrentByPersonAndType(int personId, String measureTypeName) {
         HealthProfileItem result = new HealthProfileItem();
         List<HealthProfileItem> resultList = new ArrayList<>();
         EntityManager em = HealthDao.createEntityManager();
         if (em != null) {
             Person person = Person.getById(personId);
-            Measure measure = Measure.getByName(measureType);
-            if (person != null && measure != null) {
+            MeasureType measureType = MeasureType.getByName(measureTypeName);
+            if (person != null && measureType != null) {
                 resultList = em.createNamedQuery("HealthProfile.getCurrentByPersonAndType")
                         .setParameter("person", person)
-                        .setParameter("measure", measure)
+                        .setParameter("measure", measureType)
                         .getResultList();
             }
             em.close();
@@ -227,16 +226,16 @@ public class HealthProfileItem implements Serializable {
         return result;
     }
 
-    public static List<HealthProfileItem> getAllByDate(int personId, String measureType, Date startDate, Date endDate) {
+    public static List<HealthProfileItem> getAllByDate(int personId, String measureTypeName, Date startDate, Date endDate) {
         List<HealthProfileItem> resultList = new ArrayList<>();
         EntityManager em = HealthDao.createEntityManager();
         if (em != null) {
             Person person = Person.getById(personId);
-            Measure measure = Measure.getByName(measureType);
-            if (person != null && measure != null) {
+            MeasureType measureType = MeasureType.getByName(measureTypeName);
+            if (person != null && measureType != null) {
                 resultList = em.createNamedQuery("HealthProfile.findByDate")
                         .setParameter("person", person)
-                        .setParameter("measure", measure)
+                        .setParameter("measure", measureType)
                         .setParameter("after", startDate)
                         .setParameter("before", endDate)
                         .getResultList();
@@ -248,7 +247,7 @@ public class HealthProfileItem implements Serializable {
 
     public static HealthProfileItem saveHealthProfileItem(HealthProfileItem hp) {
         EntityManager em = HealthDao.createEntityManager();
-        if (em != null && hp.getPerson() != null && hp.getMeasure() != null) {
+        if (em != null && hp.getPerson() != null && hp.getMeasureType() != null) {
             EntityTransaction tx = em.getTransaction();
             tx.begin();
             em.persist(hp);
@@ -260,7 +259,7 @@ public class HealthProfileItem implements Serializable {
 
     public static HealthProfileItem updateHealthProfileItem(HealthProfileItem hp) {
         EntityManager em = HealthDao.createEntityManager();
-        if (em != null && hp.getPerson() != null && hp.getMeasure() != null) {
+        if (em != null && hp.getPerson() != null && hp.getMeasureType() != null) {
             EntityTransaction tx = em.getTransaction();
             tx.begin();
             hp = em.merge(hp);

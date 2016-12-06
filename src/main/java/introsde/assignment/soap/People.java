@@ -1,6 +1,6 @@
 package introsde.assignment.soap;
 
-import introsde.document.models.HealthProfileItem;
+import introsde.document.models.Measure;
 import introsde.document.models.Person;
 import introsde.document.responses.*;
 
@@ -57,10 +57,10 @@ public interface People {
     // Method 9
     @WebMethod(operationName = "savePersonMeasure")
     @WebResult(name = "measure")
-    public HealthProfileItemResponse savePersonMeasure(@WebParam(name = "id") int id, @WebParam(name = "measure") HealthProfileItem healthProfileItem);
+    public HealthProfileItemResponse savePersonMeasure(@WebParam(name = "id") int id, @WebParam(name = "m") Measure m);
 
     // Method 10
     @WebMethod(operationName = "updatePersonMeasure")
     @WebResult(name = "measure")
-    public HealthProfileItemResponse updatePersonMeasure(@WebParam(name = "id") int id, @WebParam(name = "measure") HealthProfileItem healthProfileItem);
+    public HealthProfileItemResponse updatePersonMeasure(@WebParam(name = "id") int id, @WebParam(name = "m") Measure m);
 }
